@@ -18,7 +18,7 @@ func TestCommandTarget(t *testing.T) {
 	}
 }
 func TestStructuredTarget(t *testing.T) {
-	if structuredTarget("app.exe", `C:\Acme`) != `c:\acme\app.exe` {
+	if structuredTarget(`.\app.exe`, `C:\Acme`) != `c:\acme\app.exe` {
 		t.Fatal("working directory")
 	}
 	if structuredTarget("app.exe", "") != "" {
@@ -26,6 +26,17 @@ func TestStructuredTarget(t *testing.T) {
 	}
 	if structuredTarget(`\\server\app.exe`, "") != "" {
 		t.Fatal("network path accepted")
+	}
+}
+
+func TestStructuredTargetWithholdsBareExecutableSearch(t *testing.T) {
+	for _, path := range []string{"powershell.exe", "cmd.exe", "app.exe", `"app.exe"`} {
+		if got := structuredTarget(path, `C:\Users\Synthetic`); got != "" {
+			t.Fatalf("guessed bare executable location: %q", got)
+		}
+	}
+	if got := structuredTarget(`tools\app.exe`, `C:\Acme`); got != `c:\acme\tools\app.exe` {
+		t.Fatal("explicit relative target was lost")
 	}
 }
 func TestProbeDoesNotModifyInput(t *testing.T) {

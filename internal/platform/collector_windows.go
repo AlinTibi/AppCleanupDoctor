@@ -358,6 +358,12 @@ func structuredTarget(path, working string) string {
 		if filepath.IsAbs(path) || working == "" {
 			return ""
 		}
+		// A bare executable name can use Windows executable-search semantics.
+		// WorkingDirectory is not proof of its resolved location. Only explicit
+		// relative paths can be anchored there; never guess PATH/search results.
+		if !strings.ContainsAny(path, `\/`) {
+			return ""
+		}
 		path = filepath.Join(working, path)
 	}
 	if p, e := core.Normalize(path); e == nil {
