@@ -28,7 +28,7 @@ Future cleanup must require explicit approval and tested rollback. Restoration c
 
 - No historical inventory: arbitrary unnamed orphan folders cannot be reliably attributed and are withheld.
 - Registry reference detection is bounded to two Software levels and the explicit `Executable`, `ApplicationPath` and `ExePath` values. It is not a recursive string search.
-- Unquoted command paths with spaces, relative commands, hosted scripts, DLL actions, COM task actions and network targets are not guessed.
+- Unquoted command paths with spaces, short 8.3 aliases, relative commands, hosted scripts, DLL actions, COM task actions, non-fixed drives and network targets are withheld rather than guessed.
 - Collection is bounded to 5,000 entries per source/collection and task recursion to 12 levels. Warnings and truncation are reported. No directory-size traversal is performed.
 - Scans run with the current user's permissions; unreadable sources produce warnings. Administrator access is not requested automatically.
 - Service findings are report-only. Drivers, Windows components and shared runtimes are excluded.

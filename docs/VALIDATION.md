@@ -16,6 +16,8 @@ Fresh-directory launch (including spaces and a non-project working directory) pa
 
 The distinct folder/magnifier icon is embedded in the multi-resolution ICO and visible in the application window. Taskbar/Alt+Tab checks and missing-WebView2 testing in an isolated environment have not been independently completed for this product.
 
+The final local development ZIP was freshly extracted and launched successfully; its real scan completed with no automatic selection. The public repository contains no machine report or private scan data.
+
 An early scan exposed repeated disk-probe overhead and unnecessary SCM access permissions. Per-scan caching and query-only SCM access corrected those issues; subsequent native integration scans completed in approximately two seconds on the validation machine. This is not a general performance guarantee.
 
 ## Deferred safety validation
