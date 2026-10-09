@@ -158,6 +158,18 @@ func TestCustomWindowsRootProtected(t *testing.T) {
 	}
 }
 
+func TestSystemVolumeInformationWithheld(t *testing.T) {
+	for _, path := range []string{`C:\System Volume Information\app.exe`, `D:\SYSTEM VOLUME INFORMATION\app.exe`} {
+		if !Protected(path) {
+			t.Fatal("Windows volume metadata directory is not protected")
+		}
+		r := Detect(Snapshot{References: []Reference{{Kind: "Registry", Name: "Acme", Location: "Synthetic reference", Target: path}}}, probe(map[string]State{path: Missing}))
+		if len(r.Findings) != 0 {
+			t.Fatal("protected volume metadata was reported as an application leftover")
+		}
+	}
+}
+
 type countingProbe struct{ calls int }
 
 func (p *countingProbe) Check(string) State { p.calls++; return Missing }

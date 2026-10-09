@@ -57,7 +57,7 @@ func Protected(path string) bool {
 	parts := strings.Split(p[3:], `\`)
 	for _, s := range parts {
 		switch s {
-		case "windows", "system32", "syswow64", "winsxs", "windowsapps", "driverstore", "drivers", "common files", "dotnet", "microsoft.net", "webview2", "edgewebview", "microsoft", "packages", "package cache", "windows kits", "chocolatey", "scoop", "winget", "vcredist", "shared":
+		case "windows", "system32", "syswow64", "winsxs", "windowsapps", "driverstore", "drivers", "system volume information", "common files", "dotnet", "microsoft.net", "webview2", "edgewebview", "microsoft", "packages", "package cache", "windows kits", "chocolatey", "scoop", "winget", "vcredist", "shared":
 			return true
 		}
 		if strings.Contains(s, "visual c++") || strings.Contains(s, "redistributable") {
