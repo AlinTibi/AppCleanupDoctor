@@ -1,0 +1,11 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "AppCleanupDoctor",
+  "outputfilename": "AppCleanupDoctor",
+  "frontend:install": "npm ci",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {"name": "AlinTibi", "email": "contact@almarfeld.com"},
+  "info": {"productName": "App Cleanup Doctor", "productVersion": "0.1.0", "companyName": "ALMARFELD", "copyright": "Copyright (c) 2026 AlinTibi", "comments": "Offline, evidence-based, scan-only development milestone"}
+}

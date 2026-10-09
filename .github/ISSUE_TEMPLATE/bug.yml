@@ -1,0 +1,20 @@
+name: Bug report
+description: Report a reproducible problem without sharing private machine data.
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed and expected behavior
+      description: Do not paste unredacted reports, personal paths or registry exports.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and synthetic example
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Build version and Windows version
