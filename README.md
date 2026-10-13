@@ -2,7 +2,7 @@
 
 **Understand possible application leftovers before changing anything.**
 
-An offline Windows utility by ALMARFELD. This repository prepares the **v1.0.0 release candidate**. v1.0.0 has not yet been published. Windows 10/11 x64 and the separate [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) are required. Nothing is downloaded automatically.
+App Cleanup Doctor v1.0.0 is an offline Windows utility by ALMARFELD. Windows 10/11 x64 and the separate [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) are required. Nothing is downloaded automatically.
 
 ## Current workflow
 
@@ -45,7 +45,7 @@ Quarantine is stored under `%LOCALAPPDATA%\ALMARFELD\AppCleanupDoctor\Quarantine
 
 ## First run / Verify your download
 
-Use only the official ALMARFELD product or GitHub release links once the release is published. Download `AppCleanupDoctor-v1.0.0-win-x64.zip`, optionally compare its published SHA-256, extract the whole ZIP and run `AppCleanupDoctor.exe`. No separate .NET runtime is required; Microsoft Edge WebView2 Runtime must be installed separately. Nothing installs automatically.
+Use only the official ALMARFELD product or GitHub release links. Download `AppCleanupDoctor-v1.0.0-win-x64.zip`, optionally compare its published SHA-256, extract the whole ZIP and run `AppCleanupDoctor.exe`. No separate .NET runtime is required; Microsoft Edge WebView2 Runtime must be installed separately. Nothing installs automatically.
 
 ```powershell
 Get-FileHash -Algorithm SHA256 .\AppCleanupDoctor-v1.0.0-win-x64.zip
