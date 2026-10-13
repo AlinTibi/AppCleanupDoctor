@@ -14,11 +14,20 @@ type App struct {
 	MSI              bool   `json:"msi"`
 }
 type Reference struct {
-	Kind     string `json:"kind"`
-	Name     string `json:"name"`
-	Location string `json:"location"`
-	Target   string `json:"target"`
-	Vendor   string `json:"vendor"`
+	Kind     string    `json:"kind"`
+	Name     string    `json:"name"`
+	Location string    `json:"location"`
+	Target   string    `json:"target"`
+	Vendor   string    `json:"vendor"`
+	Run      *RunValue `json:"run,omitempty"`
+}
+
+// RunValue is structured collector provenance, never parsed from display text.
+type RunValue struct {
+	Hive string `json:"hive"`
+	View string `json:"view"`
+	Key  string `json:"key"`
+	Name string `json:"name"`
 }
 type Folder struct {
 	Path, Name string
@@ -33,16 +42,19 @@ type Snapshot struct {
 	Truncated      bool        `json:"truncated"`
 }
 type Finding struct {
-	ID             string   `json:"id"`
-	Group          string   `json:"group"`
-	Kind           string   `json:"kind"`
-	Location       string   `json:"location"`
-	Target         string   `json:"target"`
-	Confidence     string   `json:"confidence"`
-	Evidence       []string `json:"evidence"`
-	Recommendation string   `json:"recommendation"`
-	Risk           string   `json:"risk"`
-	Size           *int64   `json:"size"`
+	ID             string    `json:"id"`
+	Group          string    `json:"group"`
+	Kind           string    `json:"kind"`
+	Location       string    `json:"location"`
+	Target         string    `json:"target"`
+	Confidence     string    `json:"confidence"`
+	Evidence       []string  `json:"evidence"`
+	Recommendation string    `json:"recommendation"`
+	Risk           string    `json:"risk"`
+	Size           *int64    `json:"size"`
+	Run            *RunValue `json:"run,omitempty"`
+	Eligibility    string    `json:"eligibility"`
+	CleanupReason  string    `json:"cleanupReason"`
 }
 type Report struct {
 	Created   string    `json:"created"`

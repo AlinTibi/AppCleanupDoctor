@@ -1,9 +1,9 @@
-# Release notes
+# Development notes
 
-No public release has been published. The current development milestone is 0.1.0, scan only.
+No public release has been published. Version remains 0.1.0.
 
-Implemented: local application inventory, explicit missing executable references, conservative folder correlation, startup/task/service inspection, evidence-based results, review selection and optional JSON scan report export.
+This milestone adds explicit cleanup eligibility, frozen preview plans, same-volume filesystem/Startup shortcut quarantine, exact transactional Run/RunOnce backup/restore, durable item journals, conservative interrupted-operation recovery and conflict-aware Undo.
 
-Disabled: cleanup, quarantine, registry backup, rollback/restore and permanent deletion. No disk-space recovery or performance improvement is claimed.
+Services, scheduled tasks, uninstall inventory and arbitrary registry keys remain report-only. Permanent deletion, expiry and purge are unavailable. Restore can fail because of locks, permissions, conflicts or system changes. Windows folder moves are checked again after mutation and concurrent descendant changes require recovery review.
 
-A future public release requires wider detection-quality validation and separately tested cleanup/rollback. WebView2 remains a separate prerequisite.
+WebView2 remains a separate requirement. No telemetry, accounts, downloads or application update mechanism is added.

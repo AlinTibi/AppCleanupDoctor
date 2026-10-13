@@ -13,7 +13,7 @@ try {
         Copy-Item -LiteralPath (Join-Path $projectRoot $name) -Destination $stagePath
     }
     Copy-Item -LiteralPath (Join-Path $projectRoot 'docs') -Destination $stagePath -Recurse
-    $zipPath = Join-Path $artifactRoot 'AppCleanupDoctor-v0.1.0-scan-only-win-x64.zip'
+    $zipPath = Join-Path $artifactRoot 'AppCleanupDoctor-v0.1.0-reversible-cleanup-win-x64.zip'
     Compress-Archive -Path (Join-Path $stagePath '*') -DestinationPath $zipPath -Force
     $digest = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
     $entry = $digest + '  ' + [IO.Path]::GetFileName($zipPath) + "`n"

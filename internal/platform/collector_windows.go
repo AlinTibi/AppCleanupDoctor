@@ -229,7 +229,7 @@ func (r *reader) startup() {
 				for _, name := range names {
 					target := commandTarget(str(k, name))
 					if target != "" {
-						r.s.References = append(r.s.References, core.Reference{Kind: "Startup", Name: name, Location: h.name + `\` + base + " :: " + name + " [" + v.name + "]", Target: target})
+						r.s.References = append(r.s.References, core.Reference{Kind: "Startup", Name: name, Location: h.name + `\` + base + " :: " + name + " [" + v.name + "]", Target: target, Run: &core.RunValue{Hive: h.name, View: v.name, Key: base, Name: name}})
 					}
 				}
 				k.Close()

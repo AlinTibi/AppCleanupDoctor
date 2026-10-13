@@ -39,7 +39,10 @@ func Detect(s Snapshot, p Probe) Report {
 	}
 	seen := map[string]int{}
 	add := func(f Finding) {
-		logical := strings.NewReplacer(" [32-bit]", "", " [64-bit]", "").Replace(f.Location)
+		logical := f.Location
+		if f.Run == nil {
+			logical = strings.NewReplacer(" [32-bit]", "", " [64-bit]", "").Replace(logical)
+		}
 		key := strings.ToLower(f.Kind + "|" + logical + "|" + f.Target)
 		if i, ok := seen[key]; ok {
 			for _, e := range f.Evidence {
@@ -90,7 +93,7 @@ func Detect(s Snapshot, p Probe) Report {
 		if ref.Kind == "Service" {
 			risk = "Report only. Never remove a service based on a missing binary alone."
 		}
-		add(Finding{Group: group, Kind: ref.Kind, Location: ref.Location, Target: target, Confidence: confidence, Evidence: []string{"This specific Windows entry references the executable path shown below.", "The referenced local executable is positively absent: " + target}, Recommendation: "Manual investigation; cleanup is disabled.", Risk: risk})
+		add(Finding{Group: group, Kind: ref.Kind, Location: ref.Location, Target: target, Run: ref.Run, Confidence: confidence, Evidence: []string{"This specific Windows entry references the executable path shown below.", "The referenced local executable is positively absent: " + target}, Recommendation: "Review evidence and cleanup eligibility separately.", Risk: risk})
 		// A present app-data folder needs BOTH a missing executable reference and
 		// an exact bounded vendor/application name match. Name alone is withheld.
 		for _, folder := range s.Folders {
