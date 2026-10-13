@@ -37,6 +37,6 @@ jobs:
       - run: wails build -clean -s -webview2 browser
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: AppCleanupDoctor-reversible-cleanup-win-x64
+          name: AppCleanupDoctor-v1.0.0-win-x64
           path: build/bin/AppCleanupDoctor.exe
           retention-days: 14

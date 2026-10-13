@@ -15,3 +15,5 @@ Native Run/RunOnce operations use KTM registry transactions with exact raw type/
 States: Planned, Preparing, Quarantined, RestorePending, Restored, Failed, RecoveryRequired. Startup observes interrupted Preparing/RestorePending items and never resumes cleanup automatically. Uncertain state remains RecoveryRequired. An operation directory without a manifest is shown as interrupted; no payload is guessed or removed.
 
 The journal is local to the current user, not an authenticated archive against malicious same-user tampering. Invalid schema/state/payload locations fail closed. No passwords or commands with arguments are backed up. No networking, telemetry, downloads or update mechanism is added.
+
+The v1.0.0 journal loader also bounds item count, rejects duplicate or missing finding IDs, unsupported cleanup kinds, non-eligible assessments and missing/invalid backup data before native recovery. History is ordered newest first with a stable operation-ID tie break. Findings use human-readable eligibility labels; the detail dialog is modal and keyboard-dismissible. Scan cancellation is not offered during cleanup or restore.

@@ -6,3 +6,7 @@ artifacts/
 *.syso
 *.test.exe
 coverage.out
+
+# Local scan exports and copied runtime state
+AppCleanupDoctor-scan*.json
+Quarantine/

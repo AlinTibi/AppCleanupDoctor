@@ -4,3 +4,5 @@ export function summarize(findings:{id:string;kind:string;size:number|null}[],se
 
 export function canExecutePlan(plan: unknown,busy:boolean,now?:number):boolean;
 export function operationSummary(operation:unknown):{total:number;quarantined:number;restored:number;failed:number;recovery:number};
+
+export function eligibilityLabel(value: string): string;
