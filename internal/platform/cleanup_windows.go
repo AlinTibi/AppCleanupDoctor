@@ -77,7 +77,23 @@ type fileStamp struct {
 	Modified   uint64
 	Attributes uint32
 }
-type fileBackup struct{ Stamps []fileStamp }
+type fileBackup struct {
+	Stamps       []fileStamp
+	OriginalPath string
+}
+
+func originalPath(h windows.Handle) (string, error) {
+	buf := make([]uint16, 32768)
+	n, e := windows.GetFinalPathNameByHandle(h, &buf[0], uint32(len(buf)), 0)
+	if e != nil {
+		return "", e
+	}
+	if n >= uint32(len(buf)) {
+		return "", errors.New("Canonical path exceeds supported length")
+	}
+	return strings.TrimPrefix(windows.UTF16ToString(buf[:n]), `\\?\`), nil
+}
+
 type lockedTree struct {
 	handles []windows.Handle
 	source  windows.Handle
@@ -284,7 +300,11 @@ func (n NativeCleanup) Inspect(f core.Finding) (cleanup.Assessment, cleanup.Back
 		return reject(e.Error())
 	}
 	defer l.close()
-	b, _ := json.Marshal(fileBackup{l.stamps})
+	original, e := originalPath(l.source)
+	if e != nil {
+		return reject(e.Error())
+	}
+	b, _ := json.Marshal(fileBackup{Stamps: l.stamps, OriginalPath: original})
 	return cleanup.Assessment{Eligibility: cleanup.Eligible, Reason: "Explicit scanner evidence; same-volume reversible move; revalidated before execution", Action: "Move to quarantine without overwriting"}, cleanup.Backup{Data: b, Identity: fingerprint(l.stamps)}
 }
 func renameHandle(h windows.Handle, to string) error {
@@ -335,7 +355,16 @@ func (n NativeCleanup) move(item cleanup.Item, restore bool) error {
 	}
 	from, to := item.Finding.Location, item.Payload
 	if restore {
-		from, to = to, from
+		var backup fileBackup
+		if e := json.Unmarshal(item.Backup.Data, &backup); e != nil {
+			return e
+		}
+		normalized, e := core.Normalize(backup.OriginalPath)
+		expected, x := core.Normalize(item.Finding.Location)
+		if e != nil || x != nil || normalized != expected {
+			return errors.New("Original path metadata does not match the finding")
+		}
+		from, to = to, backup.OriginalPath
 	}
 	l, e := lockTree(from, true)
 	if e != nil {

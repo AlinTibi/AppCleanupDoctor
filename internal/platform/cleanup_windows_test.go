@@ -82,6 +82,19 @@ func TestNativeDirectoryRoundTrip(t *testing.T) {
 	if e = n.Restore(item); e != nil {
 		t.Fatal(e)
 	}
+	entries, e := os.ReadDir(filepath.Dir(f.Location))
+	if e != nil {
+		t.Fatal(e)
+	}
+	exactName := false
+	for _, entry := range entries {
+		if entry.Name() == "Synthetic App Ș Emoji 😀" {
+			exactName = true
+		}
+	}
+	if !exactName {
+		t.Fatal("original directory name casing not restored")
+	}
 	b, _ := os.ReadFile(filepath.Join(f.Location, "data.txt"))
 	if string(b) != "exact bytes\x00\xff" {
 		t.Fatal("content changed")
