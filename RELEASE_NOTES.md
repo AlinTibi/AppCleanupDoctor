@@ -1,4 +1,4 @@
-# App Cleanup Doctor v1.0.0 — release candidate
+# App Cleanup Doctor v1.0.0 â€” release candidate
 
 v1.0.0 is prepared for review and is not yet publicly released.
 

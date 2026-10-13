@@ -6,7 +6,7 @@ An offline Windows utility by ALMARFELD. This repository prepares the **v1.0.0 r
 
 ## Current workflow
 
-Scan Windows â†’ inspect evidence and eligibility â†’ manually select eligible items â†’ prepare and confirm a frozen cleanup plan â†’ quarantine â†’ inspect results â†’ restore if needed. JSON scan report export remains available.
+Scan Windows → inspect evidence and eligibility → manually select eligible items → prepare and confirm a frozen cleanup plan → quarantine → inspect results → restore if needed. JSON scan report export remains available.
 
 - Reads user/machine uninstall inventory in both 32-bit and 64-bit registry views, including readable Windows Installer flags and product metadata.
 - Checks explicit application/vendor executable references, Run/RunOnce entries, Startup shortcuts, scheduled task executable actions and service binary paths.
