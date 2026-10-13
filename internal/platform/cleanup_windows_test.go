@@ -17,7 +17,26 @@ import (
 
 func fixture(t *testing.T) (NativeCleanup, core.Finding) {
 	t.Helper()
-	base := t.TempDir()
+	// Some Windows runners resolve GetTempPath2 under Windows/SystemTemp.
+	// Product policy must keep rejecting that location; use a dedicated synthetic
+	// directory under the public profile instead of weakening protected-path checks.
+	public, e := windows.KnownFolderPath(windows.FOLDERID_Public, 0)
+	if e != nil {
+		t.Fatal(e)
+	}
+	base, e := os.MkdirTemp(public, "ACD-Synthetic-Test-")
+	if e != nil {
+		t.Fatal(e)
+	}
+	t.Cleanup(func() {
+		rel, e := filepath.Rel(public, base)
+		if e != nil || strings.Contains(rel, `\`) || !strings.HasPrefix(rel, "ACD-Synthetic-Test-") {
+			t.Fatal("synthetic cleanup escaped its root")
+		}
+		if e = os.RemoveAll(base); e != nil {
+			t.Error(e)
+		}
+	})
 	t.Setenv("LOCALAPPDATA", base)
 	t.Setenv("APPDATA", base)
 	source := filepath.Join(base, "Synthetic App Ș Emoji 😀")
