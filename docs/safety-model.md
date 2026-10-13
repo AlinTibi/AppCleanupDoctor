@@ -1,27 +1,13 @@
 # Safety model
 
-## Current scan-only guarantees
+Scanning remains read-only. Nothing is selected automatically. Confidence means evidence confidence; eligibility is a separate ReversibleEligible / ReportOnly / Blocked assessment with a reason.
 
-No scan code deletes, moves, edits, executes or installs detected items. Reads are bounded. No cleanup is selected automatically. Review checkboxes are review aids; the cleanup button and backend methods are disabled. Nothing is persisted unless the user exports a report to a new filename.
+Only backend findings can enter a frozen plan. Exact actions/evidence and restoration limitations are shown before confirmation. Current evidence is recollected during preparation and execution; stale targets, changed identities, unsafe/protected paths, non-fixed volumes, cross-volume moves, reparse points and hard links are refused. Locked/access-denied sources fail without elevation. A failed item does not stop unrelated eligible items, except a journal persistence failure, which stops the operation for recovery.
 
-Every finding contains explicit evidence and a risk explanation. High/Medium/Low confidence is not equivalent to safe/unsafe deletion. The initial engine uses Medium for explicit missing references and Low for correlated folders; it does not manufacture High-confidence removal approvals.
+Supported mutations: same-volume moves of correlated application folders and actual orphan Startup shortcut files; transactionally backed-up orphan Run/RunOnce values containing one supported executable command. Services, tasks, uninstall records and arbitrary registry keys remain report-only. Tasks cannot yet be restored with exact definition/state guarantees.
 
-Only positively absent local executable targets count. Access denied, unknown commands, network paths, unresolved variables and reparse points produce unknown or are withheld. An installed application's existing install tree is not flagged from a missing helper alone.
+Restore requires a free original filesystem destination and unchanged quarantined identity/tree. Existing replacements are never overwritten. Registry restore inserts only if absent; a differing current value blocks it; an already identical value is an idempotent success. Registry backups retain hive/view/key/name/type/raw bytes. Shortcuts are moved, never run or rewritten.
 
-Folder correlation requires an exact folder/application-key name plus that key's absent executable reference. Installed application and shared-vendor names suppress folder candidates. A name-only folder match is not reported.
+Prepared plans expire and are single-use. No automatic crash continuation, purge, expiry or permanent-delete API exists. Native mutation precedes final success journal state; interrupted state is inspected conservatively. Directory rename has a Windows-specific race window for descendant namespace changes after their handles close: the root identity remains locked, post-move changes are flagged RecoveryRequired, and mismatching payloads are not silently restored. No claim of unconditional safety or adversarial filesystem atomicity is made.
 
-## Protection policy
-
-Local drive paths must normalize without drive-relative, network/device, wildcard, alternate-stream, control-character or ambiguous trailing components. Matching respects directory boundaries.
-
-Windows/System32/SysWOW64/WinSxS/DriverStore/WindowsApps, drivers, Microsoft/shared runtime paths, .NET/WebView2, common files and known package-manager data are excluded. Protected identities are withheld. Folder and probe reparse points are never followed. This policy is conservative and is not a substitute for a future pre-mutation safety check.
-
-## Deliberately unimplemented
-
-Quarantine, cleanup sessions, registry backup/restore, startup/task rollback, permanent deletion and disk-space reclamation. There are no successful-cleanup or successful-Undo claims. Tests cover disabled-action refusal; operational rollback tests will accompany an actual implementation.
-
-Partial collection failure is visible through warnings and truncation. Partial cleanup failure cannot occur because cleanup is disabled.
-
-## Future cleanup acceptance criteria
-
-Explicit review and confirmation; exact immutable targets; fresh state checks; no wildcard operation; durable backup before mutation; per-item outcome; restore conflict refusal; fault-injected interruption/cross-volume/permissions/locked-file tests; service changes excluded. Backup data must stay local and never be committed or automatically shared.
+Quarantine requires the current user's permissions and stays local. Report exports and journals contain local paths/application evidence; share carefully. Runtime WebView2 remains separate and nothing is downloaded automatically.

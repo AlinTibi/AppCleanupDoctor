@@ -1,30 +1,17 @@
 # Architecture
 
-## Layers
+`internal/platform` retains read-only Windows collection. Structured Run/RunOnce provenance is collected independently of display strings. `internal/core` retains evidence-based detection and protected-path policy; registry views remain distinct for mutable startup values.
 
-`internal/platform` collects a read-only snapshot using Windows registry APIs, Service Control Manager, Task Scheduler COM and existing shortcut properties. The Wails process runs without automatic elevation. Task and shortcut COM work is pinned to one initialized OS thread.
+`internal/cleanup` owns immutable five-minute plans, operation IDs, durable schema-1 journals and item states. App methods accept finding IDs or plan/operation IDs, never arbitrary frontend paths. App serializes scanning/preparation/execution/restore. Preparation and execution recollect evidence; execution rechecks each item before mutation. A plan is consumed even on validation failure.
 
-`internal/core` contains data models, a path policy and the pure detection engine. A `Collector` supplies a snapshot; a `Probe` distinguishes exists, positively missing and unknown. Synthetic providers exercise detections without touching the machine. The disk probe checks every ancestor with `Lstat` and reparse attributes before deciding absence.
+Native filesystem operations inspect locked handles, canonical paths, protected roots, reparse attributes, file IDs, timestamps and bounded descendant metadata. Same-volume handle-based rename refuses replacement. Windows requires descendant handles to close before directory renames; the root handle remains pinned and a post-move tree mismatch is recorded as recovery-required. It does not recursively follow links or copy/delete across volumes.
 
-`App` serializes scans, supports cooperative cancellation and keeps the latest report in memory. Explicit JSON export uses exclusive file creation. It provides no deletion/move/registry-write API. Disabled cleanup/restore methods return an error even if invoked outside the UI.
+Native Run/RunOnce operations use KTM registry transactions with exact raw type/data comparison and conflict detection at commit. Unsupported types/commands, task definitions, services and general keys remain report-only. No elevation or executable invocation is used.
 
-The TypeScript UI uses the local Wails bridge, safely escapes Windows metadata, provides inventory/results/details/review/history screens and fetches no remote resources. No scan report is saved automatically.
+## Journal and recovery
 
-## Collection scope
+`%LOCALAPPDATA%\ALMARFELD\AppCleanupDoctor\Quarantine\<id>\manifest.json` stores version/schema, timestamp, finding/evidence, original location, payload path, native identity/backup, assessment, state and per-item error. `files/<index>` preserves actual payloads. Temporary journal writes are flushed and closed, then atomically replaced with write-through. Success is recorded after the native operation. A store lock serializes mutations across processes as well as the engine mutex.
 
-- HKCU/HKLM uninstall keys, 32/64-bit views: names, publishers, versions, paths, uninstall strings and WindowsInstaller flag.
-- Two Software levels, explicit executable values only. No registry traversal looking for arbitrary strings.
-- Run/RunOnce values and existing Startup `.lnk` target properties. Shortcut objects are read and never saved or run.
-- Task Scheduler ExecAction `Path`/`WorkingDirectory`; arguments are never executed. No task registration or removal.
-- SCM service configurations, excluding drivers. No start, stop or delete calls.
-- Top-level directories under known app-data/install roots. No recursive content or size scans.
+States: Planned, Preparing, Quarantined, RestorePending, Restored, Failed, RecoveryRequired. Startup observes interrupted Preparing/RestorePending items and never resumes cleanup automatically. Uncertain state remains RecoveryRequired. An operation directory without a manifest is shown as interrupted; no payload is guessed or removed.
 
-Structured task/shortcut paths are used directly. Command-line text in Run/service/uninstall records is parsed with Windows' argument parser only to identify the first executable. Relative or ambiguous targets are withheld; hosted command arguments are not investigated.
-
-## Platform references
-
-[Windows uninstall metadata](https://learn.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key), [TaskService](https://learn.microsoft.com/en-us/windows/win32/taskschd/taskservice), [ExecAction](https://learn.microsoft.com/en-us/windows/win32/taskschd/execaction).
-
-## Next boundary
-
-A future transactional cleanup layer must independently revalidate identity, path protection, reparse ancestry and current ownership immediately before changes, create exact rollback data first, handle cross-volume/locked items and interrupted sessions, and refuse unsafe restoration conflicts. Scan confidence alone is insufficient authorization.
+The journal is local to the current user, not an authenticated archive against malicious same-user tampering. Invalid schema/state/payload locations fail closed. No passwords or commands with arguments are backed up. No networking, telemetry, downloads or update mechanism is added.
