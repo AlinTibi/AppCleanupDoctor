@@ -36,6 +36,10 @@ The versioned portable package uses a whitelist: executable, MIT license, README
 
 The release workflow is tag-triggered only, verifies an annotated SSH-signed tag and its main ancestry, selects the peeled tag commit, checks the configured version, runs tests, installs the matching Wails CLI, and packages before publication. Workflow syntax and PowerShell parsing are checked locally. No release trigger, tag or publication was executed. Release notes deliberately retain candidate status until the later publication task.
 
+A fresh local clone at the readiness commit passed dependency installation, all host tests, frontend build, vet, Windows production build and packaging. The nine-file archive structure matched the working-tree package, and packaged document text matched after newline normalization. The executable hashes differed, including after normalizing generated HTML/SVG newlines; byte-for-byte reproducibility is not established. This is a successful clean-source build, not a deterministic-binary claim.
+
+The notices inventory includes the pinned Go build/transitive modules and installed frontend packages. Original upstream license and notice text is retained, including MPL-2.0 notices for build dependencies; the project itself remains MIT. No incompatible production dependency was identified.
+
 ## Limits
 
 Windows directory rename requires closing descendant handles; concurrent descendant changes are detected after the move and become RecoveryRequired. Mismatched payloads are not silently restored. Journals are structurally validated, not cryptographically authenticated against malicious same-user edits. No cross-volume pseudo-move, automatic recovery mutation, elevation, task/service cleanup, purge or permanent deletion exists. This is not a formal security proof or guaranteed rollback.
