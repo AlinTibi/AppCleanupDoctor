@@ -146,6 +146,24 @@ func TestNativeStartupFileRoundTrip(t *testing.T) {
 		t.Fatal("shortcut bytes changed")
 	}
 }
+
+func TestNativeMissingPayloadAndVanishedSource(t *testing.T) {
+	n, f := fixture(t)
+	item := nativeItem(t, n, f)
+	if e := os.Rename(f.Location, f.Location+"-outside"); e != nil {
+		t.Fatal(e)
+	}
+	if n.Quarantine(item) == nil {
+		t.Fatal("vanished source accepted")
+	}
+	if n.Restore(item) == nil {
+		t.Fatal("missing payload accepted")
+	}
+	state, err := n.Recover(item)
+	if state != "RecoveryRequired" || err == nil {
+		t.Fatal("missing source/payload falsely resolved")
+	}
+}
 func TestNativeProtectedAndCrossVolume(t *testing.T) {
 	n, f := fixture(t)
 	for _, path := range []string{`C:\`, os.Getenv("USERPROFILE"), os.Getenv("LOCALAPPDATA"), `C:\Windows\leftover`, `C:\Program Files\Common Files\Acme`, n.Root} {

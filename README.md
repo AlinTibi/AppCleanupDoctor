@@ -2,11 +2,11 @@
 
 **Understand possible application leftovers before changing anything.**
 
-An offline Windows utility by ALMARFELD. This repository contains the **0.1.0 reversible-cleanup development milestone**, not a published release. Windows 10/11 x64 and the separate [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) are required. Nothing is downloaded automatically.
+An offline Windows utility by ALMARFELD. This repository prepares the **v1.0.0 release candidate**. v1.0.0 has not yet been published. Windows 10/11 x64 and the separate [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) are required. Nothing is downloaded automatically.
 
 ## Current workflow
 
-Scan Windows → inspect evidence and eligibility → manually select eligible items → prepare and confirm a frozen cleanup plan → quarantine → inspect results → restore if needed. JSON scan report export remains available.
+Scan Windows â†’ inspect evidence and eligibility â†’ manually select eligible items â†’ prepare and confirm a frozen cleanup plan â†’ quarantine â†’ inspect results â†’ restore if needed. JSON scan report export remains available.
 
 - Reads user/machine uninstall inventory in both 32-bit and 64-bit registry views, including readable Windows Installer flags and product metadata.
 - Checks explicit application/vendor executable references, Run/RunOnce entries, Startup shortcuts, scheduled task executable actions and service binary paths.
@@ -39,8 +39,19 @@ Quarantine is stored under `%LOCALAPPDATA%\ALMARFELD\AppCleanupDoctor\Quarantine
 - Collection is bounded to 5,000 entries per source/collection and task recursion to 12 levels. Warnings and truncation are reported. Scans do not traverse folder contents. Cleanup preparation inspects at most 10,000 tree entries for identity/reparse checks without hashing every file.
 - Scans run with the current user's permissions; unreadable sources produce warnings. Administrator access is not requested automatically.
 - Service findings are report-only. Drivers, Windows components and shared runtimes are excluded.
+- A shared HKCU Run value can appear in both registry views. If both are selected, the second attempt is refused as stale and recorded separately; no replacement is removed.
 - Native collection can block briefly inside a Windows API call; cancellation is cooperative between items.
 - Windows executable is not Authenticode signed. Windows may show a reputation warning. Do not disable Windows security.
+
+## First run / Verify your download
+
+Use only the official ALMARFELD product or GitHub release links once the release is published. Download `AppCleanupDoctor-v1.0.0-win-x64.zip`, optionally compare its published SHA-256, extract the whole ZIP and run `AppCleanupDoctor.exe`. No separate .NET runtime is required; Microsoft Edge WebView2 Runtime must be installed separately. Nothing installs automatically.
+
+```powershell
+Get-FileHash -Algorithm SHA256 .\AppCleanupDoctor-v1.0.0-win-x64.zip
+```
+
+A matching hash confirms the downloaded bytes match the published artifact; it is not a malware scan or Authenticode signature. The executable is unsigned and Windows may show a reputation warning. Do not disable SmartScreen or Defender. Mutable state stays in the current user’s LocalAppData, not beside the executable.
 
 ## Build and tests
 
@@ -56,6 +67,7 @@ go vet ./...
 go test ./...
 go install github.com/wailsapp/wails/v2/cmd/wails@v2.16.0
 wails build -clean -s -webview2 browser
+./scripts/package.ps1
 ```
 
 Tests use synthetic snapshots and temporary files. Registry mutation tests are opt-in with `ACD_ISOLATED_NATIVE=1` and must run only in a disposable Windows Sandbox. They create unique controlled Run/RunOnce fixtures and restore exact type/bytes; no task or service mutations are implemented. Legacy single-call cleanup methods still refuse calls.

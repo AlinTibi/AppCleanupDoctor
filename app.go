@@ -141,10 +141,10 @@ func saveNewReport(path string, data []byte) error {
 
 // Legacy single-call mutation entry points deliberately remain disabled.
 func (a *App) Cleanup() error {
-	return errors.New("Cleanup is disabled in this scan-only milestone; no changes were made")
+	return errors.New("One-step cleanup is unavailable. Prepare and confirm a reviewed quarantine plan; no changes were made")
 }
 func (a *App) Restore() error {
-	return errors.New("Restore is unavailable: this milestone creates no cleanup sessions or quarantine")
+	return errors.New("Choose an operation in Quarantine / Restore; this legacy entry point makes no changes")
 }
 
 func (a *App) mutationStart() error {

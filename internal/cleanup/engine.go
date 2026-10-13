@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"time"
 
@@ -120,7 +121,7 @@ func New(root string, adapter Adapter) (*Engine, error) {
 		}
 		data, err := os.ReadFile(filepath.Join(root, entry.Name(), "manifest.json"))
 		if os.IsNotExist(err) {
-			e.operations[entry.Name()] = Operation{Schema: 1, Version: "0.1.0", ID: entry.Name(), Items: []Item{}, Recovery: true}
+			e.operations[entry.Name()] = Operation{Schema: 1, Version: "1.0.0", ID: entry.Name(), Items: []Item{}, Recovery: true}
 			continue
 		}
 		if err != nil {
@@ -130,8 +131,18 @@ func New(root string, adapter Adapter) (*Engine, error) {
 		if err = json.Unmarshal(data, &op); err != nil || op.Schema != 1 || op.ID != entry.Name() {
 			return nil, errors.New("Invalid quarantine journal; no mutations allowed")
 		}
+		if len(op.Items) > 100 || (len(op.Items) == 0 && !op.Recovery) {
+			return nil, errors.New("Invalid quarantine journal item count")
+		}
+		seen := map[string]bool{}
 		for i := range op.Items {
 			item := &op.Items[i]
+			if item.Finding.ID == "" || seen[item.Finding.ID] || item.Assessment.Eligibility != Eligible ||
+				(item.Finding.Kind != "Files" && item.Finding.Kind != "Startup") ||
+				item.Backup.Identity == "" || !json.Valid(item.Backup.Data) {
+				return nil, errors.New("Invalid quarantine journal item metadata; no mutations allowed")
+			}
+			seen[item.Finding.ID] = true
 			switch item.State {
 			case "Planned", "Preparing", "Quarantined", "RestorePending", "Restored", "Failed", "RecoveryRequired":
 			default:
@@ -227,7 +238,7 @@ func (e *Engine) Execute(id, scan string, revalidate func(core.Finding) error) (
 			return Operation{}, err
 		}
 	}
-	op := Operation{Schema: 1, Version: "0.1.0", ID: p.ID, Created: time.Now().UTC(), Items: p.Items}
+	op := Operation{Schema: 1, Version: "1.0.0", ID: p.ID, Created: time.Now().UTC(), Items: p.Items}
 	dir := filepath.Join(e.root, op.ID)
 	if err := os.Mkdir(dir, 0700); err != nil {
 		return Operation{}, err
@@ -343,6 +354,12 @@ func (e *Engine) History() []Operation {
 	for _, o := range e.operations {
 		out = append(out, clone(o))
 	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Created.Equal(out[j].Created) {
+			return out[i].ID < out[j].ID
+		}
+		return out[i].Created.After(out[j].Created)
+	})
 	return out
 }
 func (e *Engine) checkpoint(phase string) error {

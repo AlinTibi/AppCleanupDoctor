@@ -2,7 +2,7 @@
 
 Report suspected security issues privately to security@almarfeld.com. Do not include unredacted machine reports, credentials or personal paths in public issues.
 
-The development milestone supports explicitly confirmed reversible quarantine/restore for narrowly scoped filesystem and orphan startup findings. Services, tasks, general registry keys and permanent deletion remain unsupported. Local journals are not a security boundary against a malicious process running as the same user. Its optional JSON export creates a user-selected new file and does not overwrite an existing file.
+App Cleanup Doctor supports explicitly confirmed reversible quarantine/restore for narrowly scoped filesystem and orphan startup findings. Services, tasks, general registry keys and permanent deletion remain unsupported. Local journals are not a security boundary against a malicious process running as the same user. Its optional JSON export creates a user-selected new file and does not overwrite an existing file.
 
 Paths and Windows metadata are untrusted input. Detection does not execute discovered binaries, uninstall strings or task commands. Reparse targets and uncertain probes are withheld. The renderer escapes metadata and loads no external scripts or resources. No telemetry, uploads or runtime downloads are implemented.
 

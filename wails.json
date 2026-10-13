@@ -7,5 +7,5 @@
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
   "author": {"name": "AlinTibi", "email": "contact@almarfeld.com"},
-  "info": {"productName": "App Cleanup Doctor", "productVersion": "0.1.0", "companyName": "ALMARFELD", "copyright": "Copyright (c) 2026 AlinTibi", "comments": "Offline, evidence-based, reversible-cleanup development milestone"}
+  "info": {"productName": "App Cleanup Doctor", "productVersion": "1.0.0", "companyName": "ALMARFELD", "copyright": "Copyright (c) 2026 AlinTibi", "comments": "Offline application-leftover inspection and reversible quarantine"}
 }

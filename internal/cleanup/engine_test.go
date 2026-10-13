@@ -252,3 +252,53 @@ func TestUncertainMutationNotReportedAsUntouched(t *testing.T) {
 		t.Fatal("uncertain native mutation falsely classified", err)
 	}
 }
+
+func TestCorruptedJournalsCannotReachNativeMutation(t *testing.T) {
+	for _, variant := range []string{"malformed", "future-schema", "payload-traversal", "unknown-state", "report-only", "missing-backup", "duplicate-id"} {
+		t.Run(variant, func(t *testing.T) {
+			e, a, f := engineFixture(t)
+			p, _ := e.Prepare("scan", f, []string{"one", "two"})
+			op, err := e.Execute(p.ID, "scan", func(core.Finding) error { return nil })
+			if err != nil {
+				t.Fatal(err)
+			}
+			switch variant {
+			case "future-schema":
+				op.Schema = 2
+			case "payload-traversal":
+				op.Items[0].Payload = filepath.Join(e.root, "..", "outside")
+			case "unknown-state":
+				op.Items[0].State = "Deleted"
+			case "report-only":
+				op.Items[0].Assessment.Eligibility = ReportOnly
+			case "missing-backup":
+				op.Items[0].Backup.Identity = ""
+			case "duplicate-id":
+				op.Items[1].Finding.ID = op.Items[0].Finding.ID
+			}
+			data, _ := json.Marshal(op)
+			if variant == "malformed" {
+				data = []byte(`{"schema":`)
+			}
+			if err = os.WriteFile(filepath.Join(e.root, op.ID, "manifest.json"), data, 0600); err != nil {
+				t.Fatal(err)
+			}
+			if _, err = New(e.root, a); err == nil {
+				t.Fatal("corrupt journal accepted")
+			}
+			if a.state["one"] != "Quarantined" || a.state["two"] != "Quarantined" {
+				t.Fatal("recovery mutated native state")
+			}
+		})
+	}
+}
+
+func TestHistoryNewestFirst(t *testing.T) {
+	e, _, _ := engineFixture(t)
+	e.operations["old"] = Operation{ID: "old", Created: time.Unix(1, 0)}
+	e.operations["new"] = Operation{ID: "new", Created: time.Unix(2, 0)}
+	h := e.History()
+	if h[0].ID != "new" || h[1].ID != "old" {
+		t.Fatal("history is not ordered")
+	}
+}

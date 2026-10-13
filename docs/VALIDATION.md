@@ -1,25 +1,43 @@
-# Reversible-cleanup milestone validation
+# v1.0.0 release-readiness validation
 
-Development validation completed on 2026-10-13. No public release or real-machine cleanup was performed.
+Validation completed on 2026-10-13 against the Windows/amd64 production candidate. v1.0.0 is not publicly released. Only disposable synthetic Sandbox fixtures were mutated.
 
 ## Automated regression
 
-47 top-level Go tests (67 including subtests) are covered across the host and isolated Windows runs. The host run passed 63 test/subtest cases and skipped four explicit opt-in native cases. Those four passed in Windows Sandbox: Run/RunOnce transactions, permission-denied ACL fixture and the existing read-only collector integration. Sandbox platform and journal suites had no failures or skipped cases. The 5 frontend tests passed. Go vet, TypeScript/Vite production build and Wails v2.16.0 Windows/amd64 production build passed.
+50 top-level Go tests, 77 including subtests: the host passed 73 test/subtest cases and skipped four explicit native opt-ins. All four also passed in the network-disabled Windows Sandbox. The isolated platform and cleanup suites passed with no skips. Six frontend tests passed. Go vet, TypeScript/Vite production build, Wails v2.16.0 production build and actionlint passed.
 
-Coverage includes backend plan ownership, expiry, generation changes, immutable copies, blocked/report-only eligibility, stale tree identity, protected/custom system roots, cross-volume refusal, symlink/junction/hard-link refusal, in-use files, exact byte preservation, Unicode/spaced/nested paths, no-overwrite restore, partial failures, duplicate execution, serialization, journal-write failure, and interrupted cleanup/restore boundaries. The engine fault tests simulate before/after native mutation and persistence failure; native recovery independently inspects source/payload identity. No permanent-deletion implementation exists.
+Coverage includes plan ownership/expiry/generation, immutable copies, report-only eligibility, stale identities, protected/custom system roots, cross-volume refusal, reparse/hard-link refusal, in-use files, exact byte preservation, Unicode/spaced paths, no-overwrite restore, partial failures, consumed plans, serialization, journal-write failure and interrupted cleanup/restore boundaries. Added cases cover vanished sources, missing payloads, newest-first history and seven malformed-journal variants (malformed JSON, future schema, payload traversal, unknown state, report-only assessment, missing backup and duplicate finding ID).
 
-Go race instrumentation was not run: this workstation has CGO disabled and no C compiler. Explicit concurrent/double-execution unit tests passed; this is not a race-detector claim.
+Go race instrumentation was not run: this workstation has CGO disabled and no C compiler. Explicit concurrent/double-execution tests passed; this is not a race-detector claim. Persistence failure is injected at journal boundaries; a physically full disk and hardware power loss were not reproduced.
 
-## Actual Windows Sandbox (network disabled)
+## Production GUI and Sandbox end-to-end
 
-Only disposable synthetic fixtures were mutated. Native tests passed for correlated files/folders, unchanged bytes after restore, a Startup shortcut file, REG_SZ Run and REG_EXPAND_SZ RunOnce (32/64-bit provenance and exact raw bytes), registry restore conflicts/stale commands, real reparse/hard-link refusal and an ACL-denied source that remained untouched. Services/tasks were not modified. Scheduled tasks remain report-only because exact rollback is not implemented.
+The real packaged executable scanned a synthetic absent application with an app-data file, an actual WScript.Shell-created Startup shortcut, a vendor Software reference and an orphan HKCU Run value. No item was preselected. Finding details separated evidence confidence from eligibility. Manual selection, frozen preview, confirmation, quarantine and per-item results worked. Sources were independently checked absent and payloads present.
 
-A real .lnk was created for a harmless absent executable through WScript.Shell in Sandbox. The production executable scanned the synthetic Software reference, correlated app-data folder and orphan shortcut. Nothing was selected automatically. GUI automation selected the two eligible items, prepared the detailed plan, confirmed quarantine, inspected the two Quarantined results and restored both through Undo. Independent native checks confirmed source absence/payload presence during quarantine, then source presence/payload absence after restore. The restored synthetic file content was identical. The application ran with zero enabled network adapters; no runtime download was needed.
+Both views of the shared HKCU Run value were selected deliberately: one succeeded and the duplicate view was recorded as a stale-value failure. The app did not claim complete success. This remains a documented conservative limitation, not a registry replacement/removal workaround.
 
-The journal survived process restart and history was reloaded. All native mutation files, reports and evidence remain in ignored artifacts, not in Git. Tests do not remove real user documents or touch unrelated registry entries, tasks, services or startup items.
+History survived restart. A controlled interrupted journal produced RecoveryRequired. A replacement folder blocked restore without overwrite; after removal of only that synthetic replacement, Undo restored the file, shortcut and exact Run data. Independent SHA-256 checks matched the original file and shortcut, and the Run value matched exactly. Native tests additionally covered REG_EXPAND_SZ RunOnce and raw type/bytes, both views, changed-value conflicts and access-denied sources. Services, tasks and uninstall inventory were never mutated.
 
-## Limits of this validation
+The GUI empty state, scan progress, filters, eligible/report-only details, manual review, partial results, history, restore conflicts and recovery states were inspected. A bounded large synthetic inventory allowed real Cancel scan interaction; cancellation retained no partial results. Scan cancellation remains cooperative and native API calls are not interrupted mid-call. Cleanup/restore do not offer cancellation.
 
-This is not an adversarial filesystem proof. Windows requires closing descendant handles before directory rename; concurrent descendant namespace changes are detected after the move and become RecoveryRequired. A mismatched payload is not silently restored. Power-loss hardware durability was not physically tested; flushed/write-through journal transitions and simulated interruption were tested. Journals are not cryptographically authenticated against malicious same-user edits. No cross-volume pseudo-move, task rollback, permanent deletion, automatic expiry or elevation is supported. Cancellation applies to scanning only; cleanup/restore finish one serialized operation with per-item results.
+## Runtimes, portability and offline behavior
 
-Current CI and CodeQL results are attached to the PR; local checks do not substitute for those hosted results.
+The executable ran in Sandbox without a separate .NET installation. WebView2 is required separately. In the disposable Sandbox only, the runtime registration was temporarily hidden from the pinned loader, then restored with its exact values/types. The packaged executable displayed a controlled Microsoft Edge WebView2 Runtime-required message with the official Microsoft URL. No download, installation or host runtime modification occurred. This tested unavailable runtime discovery, not physical runtime uninstallation.
+
+Networking was disabled and there were zero enabled Sandbox network adapters throughout representative scan/quarantine/restart/restore workflows. Source inspection found no application telemetry, analytics, upload, update check or runtime downloader. The Microsoft runtime URL is explanatory text. This does not prove zero background network attempts by Windows/WebView2 internals.
+
+Fresh ZIP extraction and launch from a non-project working directory passed in Downloads-like, Desktop-like, spaced, Unicode (including Japanese), and approximately 190-character practical paths. An application directory denying file/directory creation and attribute writes still launched and responded; no state was written beside the executable. Journals remained under the current user's LocalAppData quarantine directory.
+
+The real window, taskbar and Alt+Tab icons were inspected automatically. Dark theme is the only implemented theme; light-theme testing is not applicable. The standard Sandbox display and the compact application width were inspected. Higher native Windows DPI scaling is unavailable in this remote Sandbox display and is not claimed as tested.
+
+## Package, build and workflow
+
+The versioned portable package uses a whitelist: executable, MIT license, README, security/release notes, third-party notices and architecture/safety/validation documentation. It contains no source, tests, caches, scan reports or quarantine payloads. The executable metadata is App Cleanup Doctor / ALMARFELD / 1.0.0 and the binary is not Authenticode signed.
+
+The release workflow is tag-triggered only, verifies an annotated SSH-signed tag and its main ancestry, selects the peeled tag commit, checks the configured version, runs tests, installs the matching Wails CLI, and packages before publication. Workflow syntax and PowerShell parsing are checked locally. No release trigger, tag or publication was executed. Release notes deliberately retain candidate status until the later publication task.
+
+## Limits
+
+Windows directory rename requires closing descendant handles; concurrent descendant changes are detected after the move and become RecoveryRequired. Mismatched payloads are not silently restored. Journals are structurally validated, not cryptographically authenticated against malicious same-user edits. No cross-volume pseudo-move, automatic recovery mutation, elevation, task/service cleanup, purge or permanent deletion exists. This is not a formal security proof or guaranteed rollback.
+
+Four real, consistently framed screenshots under docs/screenshots show findings, details, preview and history using synthetic data. Runtime evidence and reports remain in ignored artifacts. Hosted CI/CodeQL results belong to the readiness PR; local checks do not substitute for those results.
