@@ -1,6 +1,6 @@
 # v1.0.0 release-readiness validation
 
-Validation completed on 2026-10-13 against the Windows/amd64 production candidate. v1.0.0 is not publicly released. Only disposable synthetic Sandbox fixtures were mutated.
+Validation completed on 2026-10-13 against the Windows/amd64 production candidate. At the time of this validation, no v1.0.0 tag or public release had been created. Only disposable synthetic Sandbox fixtures were mutated.
 
 ## Automated regression
 
@@ -34,7 +34,7 @@ The real window, taskbar and Alt+Tab icons were inspected automatically. Dark th
 
 The versioned portable package uses a whitelist: executable, MIT license, README, security/release notes, third-party notices and architecture/safety/validation documentation. It contains no source, tests, caches, scan reports or quarantine payloads. The executable metadata is App Cleanup Doctor / ALMARFELD / 1.0.0 and the binary is not Authenticode signed.
 
-The release workflow is tag-triggered only, verifies an annotated SSH-signed tag and its main ancestry, selects the peeled tag commit, checks the configured version, runs tests, installs the matching Wails CLI, and packages before publication. Workflow syntax and PowerShell parsing are checked locally. No release trigger, tag or publication was executed. Release notes deliberately retain candidate status until the later publication task.
+The release workflow is tag-triggered only, verifies an annotated SSH-signed tag and its main ancestry, selects the peeled tag commit, checks the configured version, runs tests, installs the matching Wails CLI, and packages before publication. Workflow syntax and PowerShell parsing are checked locally. No release trigger, tag or publication was executed.
 
 A fresh local clone at the readiness commit passed dependency installation, all host tests, frontend build, vet, Windows production build and packaging. The nine-file archive structure matched the working-tree package, and packaged document text matched after newline normalization. The executable hashes differed, including after normalizing generated HTML/SVG newlines; byte-for-byte reproducibility is not established. This is a successful clean-source build, not a deterministic-binary claim.
 
